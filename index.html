@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Porchlight — know what you actually keep on Etsy</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxmaWx0ZXIgaWQ9Imdsb3ciIHg9Ii0xMDAlIiB5PSItMTAwJSIgd2lkdGg9IjMwMCUiIGhlaWdodD0iMzAwJSI+CiAgICAgIDxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjMuMiIvPgogICAgPC9maWx0ZXI+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9ImRvdEdyYWQiIGN4PSIzNSUiIGN5PSIzMCUiIHI9IjcwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGMEMzOUEiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjQzA4NTUyIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iIzE0MTYxQSIvPgogIDxwYXRoIGQ9Ik0xMCwzMCBRMzIsNiA1NCwzMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRURFQUUzIiBzdHJva2Utd2lkdGg9IjQuNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSI0NCIgcj0iMTUiIGZpbGw9IiNDMDg1NTIiIG9wYWNpdHk9IjAuNCIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSI0NCIgcj0iOS41IiBmaWxsPSJ1cmwoI2RvdEdyYWQpIi8+Cjwvc3ZnPgo=">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14161A;
+    --surface: #1C1F24;
+    --surface-2: #23262C;
+    --line: #33363B;
+    --text: #EDEAE3;
+    --text-dim: #9B9A94;
+    --text-faint: #6C6B66;
+    --brass: #C08552;
+    --brass-bright: #D89D6B;
+    --sage: #6FA287;
+    --sage-bright: #86BC9C;
+    --red-dim: #B06A5A;
+    --max: 1080px;
+  }
+  html{ color-scheme: dark; }
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  h1,h2,h3{ font-family: 'Fraunces', serif; font-weight: 600; letter-spacing: -0.01em; }
+  .mono{ font-family: 'IBM Plex Mono', monospace; }
+  a{ color: inherit; }
+  .wrap{ max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+  section{ padding: 96px 0; }
+  @media (max-width: 640px){ section{ padding: 64px 0; } }
+
+  /* background: dark charcoal base + soft ambient color blobs + faint linen/stitch texture */
+  .bg-blob{
+    position: fixed; border-radius: 50%; filter: blur(90px); pointer-events:none; z-index:-1;
+    opacity: 0.16; will-change: transform; transform: translateZ(0);
+  }
+  .bg-blob.b1{ width: 520px; height: 520px; top: -160px; left: -120px; background: var(--brass); }
+  .bg-blob.b2{ width: 620px; height: 620px; top: 30vh; right: -220px; background: var(--sage); opacity: 0.12; }
+  .bg-blob.b3{ width: 460px; height: 460px; bottom: -180px; left: 20vw; background: var(--brass-bright); opacity: 0.09; }
+
+  body::before{
+    content:"";
+    position: fixed; inset: 0;
+    background-color: var(--bg);
+    background-image:
+      /* linen weave */
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 5px),
+      repeating-linear-gradient(-45deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 5px),
+      /* hand-stitch dots, like running stitch along fabric seams */
+      radial-gradient(circle, rgba(237,234,227,0.05) 1px, transparent 1.4px),
+      /* vignette to keep edges calm */
+      radial-gradient(circle at 50% 0%, transparent 40%, rgba(0,0,0,0.35) 100%);
+    background-size: auto, auto, 14px 14px, auto;
+    pointer-events: none;
+    z-index: -1;
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  /* NAV */
+  nav{
+    position: sticky; top:0; z-index: 50;
+    background: #14161A;
+    border-bottom: 1px solid var(--line);
+    transform: translateZ(0);
+  }
+  nav .wrap{ display:flex; align-items:center; justify-content:space-between; padding: 18px 24px; }
+  .logo{ font-family:'Fraunces', serif; font-weight:700; font-size: 1.15rem; display:flex; align-items:center; gap:8px; }
+  .logo .dot{ width:8px; height:8px; border-radius:50%; background: var(--brass-bright); display:inline-block; }
+  .nav-cta{
+    font-family:'Inter'; font-weight:600; font-size:0.85rem;
+    background: var(--brass); color:#1A1310; padding: 9px 18px; border-radius: 100px;
+    text-decoration:none; transition: background .2s ease;
+  }
+  .nav-cta:hover{ background: var(--brass-bright); }
+
+  /* HERO */
+  .hero{ padding-top: 88px; padding-bottom: 40px; position:relative; z-index:1; }
+  .hero-grid{ display:grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items:center; }
+  @media (max-width: 900px){ .hero-grid{ grid-template-columns: 1fr; } }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size:0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--sage-bright); display:flex; align-items:center; gap:10px; margin-bottom: 20px;
+  }
+  .eyebrow::before{ content:""; width:16px; height:1px; background: var(--sage-bright); display:inline-block; }
+  h1{ font-size: clamp(2.1rem, 4.4vw, 3.4rem); line-height: 1.08; color: var(--text); margin-bottom: 22px; }
+  h1 em{ font-style: italic; color: var(--brass-bright); font-weight: 500; }
+  .sub{ font-size: 1.08rem; color: var(--text-dim); max-width: 480px; margin-bottom: 34px; }
+  .sub strong{ color: var(--text); font-weight: 600; }
+
+  form.email-form{ display:flex; gap:10px; max-width: 440px; flex-wrap: wrap; }
+  form.email-form input[type=email]{
+    flex:1; min-width: 200px; padding: 14px 16px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--text);
+    font-family:'Inter'; font-size: 0.95rem; outline:none; transition: border-color .2s;
+  }
+  form.email-form input[type=email]:focus{ border-color: var(--brass); }
+  form.email-form button{
+    padding: 14px 22px; border-radius: 10px; border:none; cursor:pointer;
+    background: var(--brass); color:#1A1310; font-family:'Inter'; font-weight:700; font-size:0.95rem;
+    transition: background .2s ease, transform .1s ease;
+  }
+  form.email-form button:hover{ background: var(--brass-bright); }
+  form.email-form button:active{ transform: scale(0.98); }
+  .form-note{ font-size: 0.8rem; color: var(--text-faint); margin-top: 12px; }
+  .form-success{ display:none; align-items:center; gap:10px; color: var(--sage-bright); font-weight:600; margin-top: 4px; }
+  .form-success.show{ display:flex; }
+
+  /* RECEIPT — signature element */
+  .receipt-wrap{ display:flex; justify-content:center; }
+  .receipt{
+    background: #EDEAE3; color:#1A1310; width: 300px; padding: 26px 24px 30px;
+    border-radius: 2px; font-family:'IBM Plex Mono', monospace; font-size: 0.82rem;
+    box-shadow: 0 30px 70px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,0,0,0.05);
+    position: relative; transform: rotate(-1.2deg);
+  }
+  .receipt::before, .receipt::after{
+    content:""; position:absolute; left:0; right:0; height:10px;
+    background: repeating-linear-gradient(45deg, transparent 0 6px, #14161A 6px 12px);
+  }
+  .receipt::before{ top:-6px; }
+  .receipt::after{ bottom:-6px; }
+  .receipt .r-head{ text-align:center; margin-bottom: 16px; }
+  .receipt .r-head .shop{ font-family:'Fraunces', serif; font-weight:700; font-size: 1rem; letter-spacing: 0.02em; }
+  .receipt .r-head .sub{ font-size: 0.68rem; color:#6b6a63; margin-top:2px; }
+  .receipt hr{ border: none; border-top: 1px dashed #b9b6ac; margin: 12px 0; }
+  .r-line{ display:flex; justify-content: space-between; padding: 4px 0; opacity:0; transform: translateY(6px); transition: all .5s ease; }
+  .r-line.show{ opacity:1; transform: translateY(0); }
+  .r-line .neg{ color: var(--red-dim); }
+  .r-line.total{ font-weight:700; font-size: 0.95rem; padding-top: 10px; }
+  .r-line.total .val{ color: var(--sage) !important; }
+  .r-toggle{
+    display:flex; gap:6px; justify-content:center; margin-top: 18px;
+  }
+  .r-toggle button{
+    font-family:'Inter'; font-size: 0.72rem; font-weight:600; padding: 6px 12px; border-radius: 100px;
+    border: 1px solid #d8d5cb; background: transparent; color:#4a4941; cursor:pointer;
+  }
+  .r-toggle button.active{ background:#1A1310; color:#EDEAE3; border-color:#1A1310; }
+
+  /* SECTION HEADERS */
+  .kicker{
+    font-family:'IBM Plex Mono', monospace; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em;
+    color: var(--brass-bright); margin-bottom: 14px;
+  }
+  h2{ font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 18px; max-width: 620px; }
+  .lead{ color: var(--text-dim); font-size: 1.02rem; max-width: 560px; margin-bottom: 40px; }
+
+  /* COMPLAINTS SECTION */
+  .quote-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 36px; }
+  @media (max-width: 720px){ .quote-grid{ grid-template-columns: 1fr; } }
+  .quote-card{
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 22px 24px;
+    position: relative;
+  }
+  .quote-card::before{
+    content: "\201C"; font-family: 'Fraunces', serif; font-size: 2.6rem; color: var(--brass); opacity: 0.5;
+    position: absolute; top: 6px; left: 16px; line-height: 1;
+  }
+  .quote-card p{ font-size: 0.92rem; color: var(--text); line-height: 1.55; padding-left: 4px; }
+  .quote-src{ font-family:'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--text-faint); margin-top: 12px; }
+  .hard-number{
+    margin-top: 32px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--sage);
+    border-radius: 10px; padding: 26px 30px; max-width: 680px;
+  }
+  .hard-number-val{ font-family:'Fraunces', serif; font-weight:700; font-size: 2.2rem; color: var(--sage-bright); margin-bottom: 10px; }
+  .hard-number-val span{ font-size: 1.1rem; color: var(--text-dim); font-weight: 500; }
+  .hard-number p{ color: var(--text-dim); font-size: 0.92rem; }
+  .callout{
+    background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--brass);
+    border-radius: 10px; padding: 28px 30px; max-width: 680px;
+  }
+  .callout p{ color: var(--text); font-size: 1.02rem; line-height: 1.6; }
+  .callout .src{ margin-top: 14px; font-family:'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--text-faint); }
+
+  /* FEE STACK VISUAL */
+  .stack{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 36px; }
+  @media (max-width: 720px){ .stack{ grid-template-columns: 1fr; } }
+  .stack-card{
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 28px;
+  }
+  .stack-card h3{ font-size: 1.1rem; margin-bottom: 4px; }
+  .stack-card .stack-sub{ font-size: 0.85rem; color: var(--text-faint); margin-bottom: 20px; }
+  .bar-row{ display:flex; align-items:center; gap: 12px; margin-bottom: 10px; }
+  .bar-row .label{ width: 108px; font-size: 0.78rem; color: var(--text-dim); flex-shrink:0; }
+  .bar-track{ flex:1; height: 10px; background: var(--surface-2); border-radius: 6px; overflow:hidden; }
+  .bar-fill{ height:100%; border-radius: 6px; background: var(--brass); }
+  .bar-fill.kept{ background: var(--sage); }
+  .bar-row .val{ width: 58px; text-align:right; font-family:'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--text-dim); flex-shrink:0; }
+  .stack-result{
+    margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line);
+    display:flex; justify-content: space-between; align-items:baseline;
+  }
+  .stack-result .kept-label{ font-size: 0.85rem; color: var(--text-dim); }
+  .stack-result .kept-val{ font-family:'Fraunces', serif; font-weight:700; font-size: 1.6rem; }
+  .stack-result .kept-val.good{ color: var(--sage-bright); }
+  .stack-result .kept-val.bad{ color: var(--red-dim); }
+
+  /* PROOF STRIP */
+  .proof-strip{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 900px){ .proof-strip{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px){ .proof-strip{ grid-template-columns: 1fr; } }
+  .proof-card{ background: var(--surface); border:1px solid var(--line); border-radius: 14px; padding: 26px; }
+  .proof-num{ font-family:'Fraunces', serif; font-weight:700; font-size: 2.1rem; color: var(--brass-bright); line-height:1; }
+  .proof-label{ font-size: 0.88rem; color: var(--text-dim); margin-top: 10px; }
+  .proof-src{ font-family:'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-faint); margin-top: 10px; }
+
+  /* HOW IT WORKS */
+  .steps{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 40px; }
+  @media (max-width: 780px){ .steps{ grid-template-columns: 1fr; } }
+  .step{ position: relative; padding-left: 4px; }
+  .step .num{ font-family:'IBM Plex Mono', monospace; color: var(--brass-bright); font-size: 0.8rem; margin-bottom: 12px; display:block; }
+  .step h3{ font-size: 1.05rem; margin-bottom: 8px; }
+  .step p{ color: var(--text-dim); font-size: 0.92rem; }
+
+  /* LAPTOP MOCKUP */
+  .laptop{ max-width: 860px; margin: 48px auto 0; }
+  .laptop-bezel{
+    background: #0D0F12; border-radius: 18px 18px 6px 6px; padding: 16px 16px 0;
+    box-shadow: 0 40px 90px -30px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .laptop-cam{ width:6px; height:6px; border-radius:50%; background:#3a3d42; margin: 0 auto 10px; }
+  .laptop-screen{ background: var(--surface); border-radius: 8px 8px 0 0; overflow:hidden; border: 1px solid var(--line); }
+  .laptop-base{
+    height: 14px; background: linear-gradient(to bottom, #1a1c20, #0D0F12);
+    border-radius: 0 0 10px 10px; position: relative;
+  }
+  .laptop-base::after{
+    content:""; position:absolute; left:50%; top:0; transform: translateX(-50%);
+    width: 90px; height: 5px; background: #060708; border-radius: 0 0 6px 6px;
+  }
+  .browser-bar{ display:flex; align-items:center; gap:10px; padding: 10px 14px; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+  .browser-bar .dots{ display:flex; gap:6px; }
+  .browser-bar .dots span{ width:9px; height:9px; border-radius:50%; background:#3a3d42; }
+  .browser-bar .url{
+    flex:1; background: var(--bg); border-radius: 6px; padding: 5px 12px; font-family:'IBM Plex Mono', monospace;
+    font-size: 0.7rem; color: var(--text-faint); text-align:center; max-width: 260px; margin: 0 auto;
+  }
+  .dash{ padding: 22px 22px 26px; }
+  .dash-kpis{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 640px){ .dash-kpis{ grid-template-columns: repeat(2, 1fr); } }
+  .kpi{ background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .kpi .kpi-label{ font-size: 0.66rem; text-transform:uppercase; letter-spacing:0.04em; color: var(--text-faint); font-family:'IBM Plex Mono', monospace; }
+  .kpi .kpi-val{ font-family:'Fraunces', serif; font-weight:700; font-size: 1.25rem; margin-top: 4px; }
+  .kpi .kpi-val.profit{ color: var(--sage-bright); }
+  .dash-charts{ display:grid; grid-template-columns: 1.3fr 1fr; gap: 14px; margin-bottom: 20px; }
+  @media (max-width: 640px){ .dash-charts{ grid-template-columns: 1fr; } }
+  .chart-card{ background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .chart-card .chart-title{ font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px; font-weight:600; }
+  .dash-table{ background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; overflow:hidden; }
+  .dash-table table{ min-width: 0; }
+  .dash-table th, .dash-table td{ padding: 9px 14px; font-size: 0.78rem; }
+
+  .dash-sync{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+  .dash-sync .sync-status{ display:flex; align-items:center; gap: 7px; font-family:'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-faint); }
+  .dash-sync .sync-dot{ width:6px; height:6px; border-radius:50%; background: var(--sage-bright); box-shadow: 0 0 0 0 rgba(134,188,156,0.5); animation: pulse-dot 2s infinite; }
+  @keyframes pulse-dot{ 0%{ box-shadow: 0 0 0 0 rgba(134,188,156,0.4); } 70%{ box-shadow: 0 0 0 5px rgba(134,188,156,0); } 100%{ box-shadow: 0 0 0 0 rgba(134,188,156,0); } }
+  .dash-sync .range-pill{ font-family:'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--line); padding: 4px 10px; border-radius: 100px; }
+  .kpi-delta{ font-family:'IBM Plex Mono', monospace; font-size: 0.66rem; margin-top: 3px; }
+  .kpi-delta.up{ color: var(--sage-bright); }
+  .kpi-delta.down{ color: var(--red-dim); }
+
+  .dash-charts2{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  @media (max-width: 640px){ .dash-charts2{ grid-template-columns: 1fr; } }
+  .breakdown-bar{ display:flex; height: 14px; border-radius: 7px; overflow:hidden; margin: 10px 0 12px; }
+  .breakdown-legend{ display:flex; flex-direction:column; gap: 7px; }
+  .legend-row{ display:flex; align-items:center; justify-content:space-between; font-size: 0.76rem; }
+  .legend-row .lg-left{ display:flex; align-items:center; gap: 8px; color: var(--text-dim); }
+  .legend-row .lg-dot{ width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+  .legend-row .lg-val{ font-family:'IBM Plex Mono', monospace; color: var(--text); }
+
+  .ads-compare{ margin-top: 6px; }
+  .ads-row{ margin-bottom: 14px; }
+  .ads-row .ads-label{ display:flex; justify-content:space-between; font-size: 0.76rem; color: var(--text-dim); margin-bottom: 5px; }
+  .ads-row .ads-label b{ color: var(--text); font-weight:600; }
+  .ads-track{ height: 9px; background: var(--surface); border-radius: 5px; overflow:hidden; }
+  .ads-fill{ height:100%; border-radius: 5px; }
+  .ads-fill.organic{ background: var(--sage); }
+  .ads-fill.ads{ background: var(--brass); }
+  .ads-summary{
+    margin-top: 12px; font-size: 0.78rem; color: var(--text-dim); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+  }
+  .ads-summary b{ color: var(--brass-bright); }
+
+  .dash-alert{
+    display:flex; align-items:flex-start; gap: 12px; background: rgba(176,106,90,0.08);
+    border: 1px solid rgba(176,106,90,0.35); border-left: 3px solid var(--red-dim);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 20px;
+  }
+  .dash-alert .alert-icon{ font-size: 0.95rem; margin-top: 1px; }
+  .dash-alert .alert-title{ font-size: 0.82rem; font-weight:600; color: var(--text); margin-bottom: 3px; }
+  .dash-alert .alert-body{ font-size: 0.78rem; color: var(--text-dim); }
+  .dash-alert .alert-body b{ color: var(--red-dim); }
+
+  .dash-trend{
+    display:flex; align-items:center; justify-content:space-between; gap: 20px; flex-wrap:wrap;
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin-top: 20px;
+  }
+  .dash-trend .trend-text{ font-size: 0.82rem; color: var(--text-dim); max-width: 420px; }
+  .dash-trend .trend-text b{ color: var(--text); }
+  .dash-trend .trend-bars{ display:flex; align-items:flex-end; gap: 16px; }
+  .trend-col{ text-align:center; }
+  .trend-col .bar{ width: 28px; border-radius: 4px 4px 0 0; margin: 0 auto 6px; }
+  .trend-col .bar.then{ height: 46px; background: var(--text-faint); }
+  .trend-col .bar.now{ height: 34px; background: var(--brass); }
+  .trend-col .tc-label{ font-family:'IBM Plex Mono', monospace; font-size: 0.62rem; color: var(--text-faint); }
+  .trend-col .tc-val{ font-family:'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-dim); margin-top: 2px; }
+
+  /* SCREEN TABS inside laptop */
+  .screen-tabs{ display:flex; gap: 6px; padding: 10px 22px 0; background: var(--surface); }
+  .screen-tab{
+    font-family:'Inter'; font-size: 0.78rem; font-weight:600; padding: 8px 16px; border-radius: 8px 8px 0 0;
+    background: transparent; color: var(--text-faint); border:none; cursor:pointer; transition: all .15s ease;
+  }
+  .screen-tab.active{ background: var(--surface-2); color: var(--text); }
+  .screen-panel{ display:none; }
+  .screen-panel.active{ display:block; }
+
+  /* All-listings screen */
+  .listings-toolbar{ display:flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .listings-search{
+    flex:1; min-width: 160px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px;
+    padding: 8px 12px; font-size: 0.8rem; color: var(--text-faint); font-family:'Inter';
+  }
+  .filter-pill{
+    font-family:'IBM Plex Mono', monospace; font-size: 0.68rem; padding: 7px 13px; border-radius: 100px;
+    background: var(--surface-2); border: 1px solid var(--line); color: var(--text-dim); cursor:pointer;
+  }
+  .filter-pill.active{ background: rgba(192,133,82,0.16); color: var(--brass-bright); border-color: transparent; }
+  .full-table{ background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; overflow:hidden; }
+  .full-table table{ min-width: 0; }
+  .full-table th, .full-table td{ padding: 9px 14px; font-size: 0.78rem; }
+  .full-table td.listing-name{ display:flex; align-items:center; gap: 8px; }
+  .thumb{ width: 22px; height: 22px; border-radius: 5px; flex-shrink:0; }
+
+  /* PHONE MOCKUP */
+  .phone-wrap{ display:flex; justify-content:center; margin-top: 40px; }
+  .phone-frame{
+    width: 260px; background: #0D0F12; border-radius: 34px; padding: 12px;
+    box-shadow: 0 30px 70px -20px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .phone-notch{ width: 70px; height: 16px; background: #0D0F12; border-radius: 0 0 12px 12px; margin: 0 auto; position: relative; top: -2px; z-index: 2; }
+  .phone-screen{ background: var(--surface); border-radius: 22px; overflow: hidden; margin-top: -16px; }
+  .phone-status{ display:flex; justify-content:space-between; padding: 14px 18px 4px; font-family:'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--text-faint); }
+  .email-mock{ padding: 6px 18px 22px; }
+  .email-from{ display:flex; align-items:center; gap: 8px; margin-bottom: 10px; }
+  .email-avatar{ width: 26px; height: 26px; border-radius: 50%; background: var(--brass); flex-shrink:0; }
+  .email-from-name{ font-size: 0.78rem; font-weight:600; color: var(--text); }
+  .email-from-sub{ font-size: 0.65rem; color: var(--text-faint); }
+  .email-subject{ font-family:'Fraunces', serif; font-weight:600; font-size: 1.0rem; color: var(--text); margin: 6px 0 10px; line-height:1.3; }
+  .email-body{ font-size: 0.78rem; color: var(--text-dim); line-height: 1.55; margin-bottom: 14px; }
+  .email-stat-chip{
+    display:inline-flex; align-items:center; gap: 6px; background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 100px; padding: 5px 11px; font-family:'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--red-dim);
+    margin-bottom: 12px;
+  }
+  .email-cta{
+    display:block; text-align:center; background: var(--brass); color:#1A1310; font-weight:700; font-size: 0.78rem;
+    padding: 10px; border-radius: 8px; margin-top: 6px;
+  }
+
+  /* ROADMAP */
+  .roadmap{ position:relative; padding-left: 52px; margin-top: 44px; }
+  .roadmap-rail{ position:absolute; left: 14px; top: 6px; bottom: 6px; width: 2px; background: var(--line); border-radius: 2px; }
+  .roadmap-rail-fill{
+    position:absolute; left: 14px; top: 6px; width: 2px; border-radius: 2px; height: 0%;
+    background: linear-gradient(to bottom, var(--brass), var(--sage)); transition: height 0.9s cubic-bezier(.4,0,.2,1);
+  }
+  .roadmap-item{ position:relative; padding-bottom: 48px; }
+  .roadmap-item:last-child{ padding-bottom: 0; }
+  .roadmap-dot{
+    position:absolute; left: -52px; top: 0; width: 30px; height: 30px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--line); display:flex; align-items:center; justify-content:center;
+    transition: border-color 0.5s ease, box-shadow 0.5s ease; z-index: 2;
+  }
+  .roadmap-dot::after{ content:""; width: 8px; height: 8px; border-radius: 50%; background: var(--text-faint); transition: background 0.5s ease; }
+  .roadmap-item.reached .roadmap-dot{ border-color: var(--brass); box-shadow: 0 0 0 5px rgba(192,133,82,0.14); }
+  .roadmap-item.reached .roadmap-dot::after{ background: var(--brass-bright); }
+  .roadmap-item.now .roadmap-dot::after{ animation: pulse-dot 2s infinite; }
+  .roadmap-status{
+    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size: 0.66rem; text-transform:uppercase;
+    letter-spacing: 0.05em; padding: 3px 10px; border-radius: 100px; margin-bottom: 10px;
+  }
+  .roadmap-status.now{ background: rgba(192,133,82,0.16); color: var(--brass-bright); }
+  .roadmap-status.next{ background: rgba(111,162,135,0.14); color: var(--sage-bright); }
+  .roadmap-status.later{ background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--line); }
+  .roadmap-status.exploring{ background: transparent; color: var(--text-faint); border: 1px dashed var(--line); }
+  .roadmap-item h3{ font-size: 1.05rem; margin-bottom: 8px; transition: color 0.5s ease; }
+  .roadmap-item p{ color: var(--text-dim); font-size: 0.9rem; max-width: 600px; }
+  .roadmap-item .rm-note{
+    display:inline-flex; align-items:center; gap: 6px; font-family:'IBM Plex Mono', monospace; font-size: 0.7rem;
+    color: var(--text-faint); margin-top: 10px;
+  }
+  .roadmap-item.reached h3{ color: var(--text); }
+  .badge{ padding: 2px 8px; border-radius: 100px; font-family:'IBM Plex Mono', monospace; font-size: 0.7rem; }
+  .badge.good{ background: rgba(111,162,135,0.16); color: var(--sage-bright); }
+  .badge.mid{ background: rgba(192,133,82,0.16); color: var(--brass-bright); }
+  .badge.low{ background: rgba(176,106,90,0.16); color: var(--red-dim); }
+  .caption-note{ text-align:center; font-family:'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--text-faint); margin-top: 14px; }
+
+  /* CONNECT VS CSV */
+  .connect-split{ display:grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 40px; }
+  @media (max-width: 720px){ .connect-split{ grid-template-columns: 1fr; } }
+  .connect-card{ background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 26px 26px; }
+  .connect-card .tag{
+    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform:uppercase;
+    letter-spacing:0.05em; padding: 4px 10px; border-radius: 100px; margin-bottom: 14px;
+  }
+  .connect-card.a .tag{ background: rgba(192,133,82,0.14); color: var(--brass-bright); }
+  .connect-card.b .tag{ background: rgba(111,162,135,0.14); color: var(--sage-bright); }
+  .connect-card h3{ font-size: 1.05rem; margin-bottom: 10px; }
+  .connect-card p{ font-size: 0.88rem; color: var(--text-dim); }
+  .connect-note{
+    margin-top: 18px; font-size: 0.85rem; color: var(--text-dim); max-width: 680px;
+    background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--brass);
+    border-radius: 10px; padding: 18px 22px;
+  }
+
+  /* COMPARISON */
+  .compare{ margin-top: 36px; overflow-x:auto; }
+  table{ width:100%; border-collapse: collapse; min-width: 560px; background: transparent; color: var(--text); }
+  th, td{ text-align:left; padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 0.9rem; background: transparent; color: var(--text); }
+  th{ font-family:'IBM Plex Mono', monospace; font-size: 0.72rem; text-transform:uppercase; letter-spacing:0.05em; color: var(--text-faint) !important; }
+  td.hl{ color: var(--sage-bright); font-weight:600; }
+  tr.us{ background: rgba(111,162,135,0.06); }
+
+  /* URGENCY / TIMELINE */
+  .timeline{ margin-top: 36px; border-left: 1px solid var(--line); padding-left: 28px; display:flex; flex-direction:column; gap: 26px; }
+  .tl-item{ position:relative; }
+  .tl-item::before{ content:""; position:absolute; left:-33px; top:4px; width:9px; height:9px; border-radius:50%; background: var(--brass); }
+  .tl-item .tl-date{ font-family:'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--text-faint); margin-bottom: 4px; }
+  .tl-item p{ color: var(--text-dim); font-size: 0.92rem; }
+  .tl-item strong{ color: var(--text); }
+
+  /* FINAL CTA */
+  .final{
+    background: linear-gradient(160deg, var(--surface), var(--bg));
+    border: 1px solid var(--line); border-radius: 22px; padding: 64px 40px; text-align:center;
+  }
+  @media (max-width: 640px){ .final{ padding: 44px 24px; } }
+  .final h2{ margin: 0 auto 14px; }
+  .final .sub{ margin: 0 auto 34px; text-align:center; }
+  .final form.email-form{ margin: 0 auto; justify-content:center; }
+
+  footer{ padding: 40px 0 60px; text-align:center; color: var(--text-faint); font-size: 0.82rem; }
+  footer a{ color: var(--text-dim); text-decoration: underline; }
+
+  .fade-in{ opacity:0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+  .fade-in.visible{ opacity:1; transform: translateY(0); }
+  /* SUCCESS MODAL */
+  .modal-overlay{
+    position: fixed; inset: 0; background: rgba(10,11,13,0.72); backdrop-filter: none;
+    display:flex; align-items:center; justify-content:center; z-index: 100;
+    opacity: 0; pointer-events:none; transition: opacity 0.25s ease; padding: 20px;
+  }
+  .modal-overlay.show{ opacity: 1; pointer-events:auto; }
+  .modal-card{
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+    max-width: 440px; width: 100%; padding: 36px 32px; text-align:center; position:relative;
+    transform: translateY(14px) scale(0.98); transition: transform 0.3s ease;
+    box-shadow: 0 40px 90px -20px rgba(0,0,0,0.6);
+  }
+  .modal-overlay.show .modal-card{ transform: translateY(0) scale(1); }
+  .modal-close{
+    position:absolute; top:14px; right:16px; background:none; border:none; color: var(--text-faint);
+    font-size: 1.1rem; cursor:pointer; line-height:1; padding: 4px;
+  }
+  .modal-close:hover{ color: var(--text); }
+  .modal-icon{
+    width: 52px; height: 52px; border-radius: 50%; background: rgba(192,133,82,0.14);
+    display:flex; align-items:center; justify-content:center; margin: 0 auto 18px; font-size: 1.4rem;
+  }
+  .modal-count{
+    font-family:'Fraunces', serif; font-weight:700; font-size: 1.6rem; color: var(--brass-bright); margin-bottom: 6px;
+  }
+  .modal-title{ font-family:'Fraunces', serif; font-weight:600; font-size: 1.25rem; margin-bottom: 12px; }
+  .modal-body{ color: var(--text-dim); font-size: 0.92rem; line-height: 1.6; }
+  .modal-body b{ color: var(--text); }
+  .modal-nugget{
+    margin-top: 16px; padding: 14px 16px; background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 10px; font-size: 0.84rem; color: var(--text-dim); text-align:left;
+  }
+  .modal-nugget b{ color: var(--sage-bright); }
+
+  /* FEEDBACK SECTION */
+  .feedback-box{
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 40px;
+    max-width: 640px; margin: 0 auto;
+  }
+  @media (max-width: 640px){ .feedback-box{ padding: 28px 22px; } }
+  .feedback-box textarea{
+    width:100%; min-height: 110px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 14px; color: var(--text); font-family:'Inter'; font-size: 0.92rem; resize: vertical; outline:none;
+    margin-bottom: 12px; transition: border-color 0.2s;
+  }
+  .feedback-box textarea:focus{ border-color: var(--brass); }
+  .feedback-box input[type=email]{
+    width:100%; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
+    padding: 11px 14px; color: var(--text); font-family:'Inter'; font-size: 0.88rem; outline:none;
+    margin-bottom: 14px; transition: border-color 0.2s;
+  }
+  .feedback-box input[type=email]:focus{ border-color: var(--brass); }
+  .feedback-box .fb-note{ font-size: 0.78rem; color: var(--text-faint); margin-bottom: 14px; }
+  .feedback-box button{
+    padding: 12px 24px; border-radius: 10px; border:none; cursor:pointer;
+    background: var(--brass); color:#1A1310; font-family:'Inter'; font-weight:700; font-size:0.92rem;
+    transition: background 0.2s ease;
+  }
+  .feedback-box button:hover{ background: var(--brass-bright); }
+  .fb-success{ display:none; align-items:center; gap:8px; color: var(--sage-bright); font-weight:600; margin-top:10px; }
+  .fb-success.show{ display:flex; }
+</style>
+</head>
+<body style="background:#14161A; color:#EDEAE3;">
+
+<div class="bg-blob b1"></div>
+<div class="bg-blob b2"></div>
+<div class="bg-blob b3"></div>
+
+<div class="modal-overlay" id="success-modal">
+  <div class="modal-card">
+    <button class="modal-close" id="modal-close-btn" aria-label="Close">✕</button>
+    <div class="modal-icon" id="modal-icon">🎉</div>
+    <div class="modal-count" id="modal-count" style="display:none;"></div>
+    <div class="modal-title" id="modal-title">You're in</div>
+    <div class="modal-body" id="modal-body">Thanks for signing up.</div>
+    <div class="modal-nugget" id="modal-nugget" style="display:none;"></div>
+  </div>
+</div>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">
+      <svg width="26" height="26" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+        <defs>
+          <filter id="navGlow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="2.2"/>
+          </filter>
+          <radialGradient id="navDotGrad" cx="35%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#F0C39A"/>
+            <stop offset="100%" stop-color="#C08552"/>
+          </radialGradient>
+        </defs>
+        <path d="M5,15 Q16,3 27,15" fill="none" stroke="#EDEAE3" stroke-width="2.3" stroke-linecap="round"/>
+        <circle cx="16" cy="22" r="7" fill="#C08552" opacity="0.4" filter="url(#navGlow)"/>
+        <circle cx="16" cy="22" r="4.4" fill="url(#navDotGrad)"/>
+      </svg>
+      Porchlight
+    </div>
+    <a href="#waitlist" class="nav-cta">Get early access</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">For Etsy sellers</div>
+      <h1>You know what you <em>sold.</em><br>Do you know what you <em>kept?</em></h1>
+      <p class="sub">Etsy shows your sales and payment activity — not the full picture of what you actually keep. Between listing, transaction, payment-processing, and Offsite Ads fees, the amount that reaches you can be very different from the order total. <strong>Porchlight</strong> shows your profit after every Etsy fee, per order — and lets you add your own costs for the fuller picture, if you want it.</p>
+      <form class="email-form" id="waitlist-form">
+        <input type="email" id="email-input" placeholder="you@yourshop.com" required>
+        <button type="submit">Join the waitlist</button>
+      </form>
+      <div class="form-success" id="form-success">✓ You're on the list — we'll email you first.</div>
+      <p class="form-note">No spam. No card. Just tell us if this is worth building.</p>
+    </div>
+    <div class="receipt-wrap fade-in">
+      <div class="receipt">
+        <div class="r-head">
+          <div class="shop">Order Receipt</div>
+          <div class="sub">$100.00 sale · US shop</div>
+        </div>
+        <hr>
+        <div class="r-line show"><span>Item price</span><span>$100.00</span></div>
+        <div class="r-line" data-i="1"><span>Listing fee</span><span class="neg">–$0.20</span></div>
+        <div class="r-line" data-i="2"><span>Transaction fee (6.5%)</span><span class="neg">–$6.50</span></div>
+        <div class="r-line" data-i="3"><span>Payment processing</span><span class="neg">–$3.25</span></div>
+        <div class="r-line" data-i="4" id="ads-line"><span>Offsite Ads (15%)</span><span class="neg">–$15.00</span></div>
+        <hr>
+        <div class="r-line total" id="total-line"><span>You keep</span><span class="val" id="total-val">$75.05</span></div>
+        <div class="r-toggle">
+          <button class="active" data-mode="ads">With Offsite Ads</button>
+          <button data-mode="noads">Without</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="gap">
+  <div class="wrap">
+    <div class="kicker">The gap</div>
+    <h2 class="fade-in">Even Etsy admits its calculator doesn't tell you this.</h2>
+    <p class="lead fade-in">Etsy's built-in profit estimate is a starting point, not the real number. In its own Seller Handbook, Etsy explains that the estimate leaves out exactly the fee that hurts the most.</p>
+    <div class="callout fade-in">
+      <p>Etsy's Seller Handbook states plainly that its profit calculator only offers a basic estimate — and does not account for fees that vary order to order, including Offsite Ads, which can add up to 15% on top of everything else.</p>
+      <div class="src">— Etsy Seller Handbook, "Easily Estimate Your Profits With Our New Profit Calculator"</div>
+    </div>
+  </div>
+</section>
+
+<section id="complaints">
+  <div class="wrap">
+    <div class="kicker">Not a countdown — real words</div>
+    <h2 class="fade-in">This isn't a hypothetical pain point.</h2>
+    <p class="lead fade-in">We won't put a fake "1,204 sellers agree" counter here — nobody's actually tracking that number, and making one up wouldn't be honest. What we can show you is real: sellers saying this, in their own words, on Etsy's own forums.</p>
+
+    <div class="quote-grid">
+      <div class="quote-card fade-in">
+        <p>"My husband asked how much Etsy makes off my store — I was really surprised. Etsy 'made' about 21% of my sales, and I hadn't really registered that until he asked."</p>
+        <div class="quote-src">— seller, Etsy Community forum ("Overall Etsy Profits")</div>
+      </div>
+      <div class="quote-card fade-in">
+        <p>A seller described getting a listing fee, a transaction fee, and a separate deduction all on one sale — and said they were just trying to work out what they'd actually made after everything.</p>
+        <div class="quote-src">— seller, Etsy Community forum ("Etsy fees - What is my profit?")</div>
+      </div>
+      <div class="quote-card fade-in">
+        <p>One seller credited a fee-analysis tool with showing they were quietly losing money on certain items — and said without it, they'd likely have given up on their shop within a few years.</p>
+        <div class="quote-src">— seller, Etsy Community forum</div>
+      </div>
+      <div class="quote-card fade-in">
+        <p>"I added up my numbers and about 26.7% of my sale goes towards fees and taxes. That is ridiculous."</p>
+        <div class="quote-src">— seller, Etsy Community forum</div>
+      </div>
+    </div>
+
+    <div class="hard-number fade-in">
+      <div class="hard-number-val">0 <span>of 715,300</span></div>
+      <p>order lines analyzed by inventory-tracking company Craftybase had labor cost tracked at all — across 325 real maker accounts. Their conclusion: most handmade sellers are running without a clear picture of their true cost.</p>
+      <div class="quote-src">— Craftybase, maker profit-margin benchmark study</div>
+    </div>
+  </div>
+</section>
+
+<section id="fees">
+  <div class="wrap">
+    <div class="kicker">The real math</div>
+    <h2 class="fade-in">A $100 sale isn't a $100 sale.</h2>
+    <p class="lead fade-in">Fees stack in ways that aren't obvious from Etsy's dashboard — and they apply to shipping you charge, not just the item price.</p>
+    <div class="stack">
+      <div class="stack-card fade-in">
+        <h3>Typical order</h3>
+        <div class="stack-sub">$100 item, sold organically</div>
+        <div class="bar-row"><span class="label">Listing</span><div class="bar-track"><div class="bar-fill" style="width:2%"></div></div><span class="val">$0.20</span></div>
+        <div class="bar-row"><span class="label">Transaction</span><div class="bar-track"><div class="bar-fill" style="width:65%"></div></div><span class="val">$6.50</span></div>
+        <div class="bar-row"><span class="label">Processing</span><div class="bar-track"><div class="bar-fill" style="width:32%"></div></div><span class="val">$3.25</span></div>
+        <div class="stack-result">
+          <span class="kept-label">You keep</span>
+          <span class="kept-val good">$90.05</span>
+        </div>
+      </div>
+      <div class="stack-card fade-in">
+        <h3>Same order, via Offsite Ads</h3>
+        <div class="stack-sub">Same $100 item — Etsy placed the ad</div>
+        <div class="bar-row"><span class="label">Listing</span><div class="bar-track"><div class="bar-fill" style="width:2%"></div></div><span class="val">$0.20</span></div>
+        <div class="bar-row"><span class="label">Transaction</span><div class="bar-track"><div class="bar-fill" style="width:65%"></div></div><span class="val">$6.50</span></div>
+        <div class="bar-row"><span class="label">Processing</span><div class="bar-track"><div class="bar-fill" style="width:32%"></div></div><span class="val">$3.25</span></div>
+        <div class="bar-row"><span class="label">Offsite Ads</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="val">$15.00</span></div>
+        <div class="stack-result">
+          <span class="kept-label">You keep</span>
+          <span class="kept-val bad">$75.05</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="proof">
+  <div class="wrap">
+    <div class="kicker">This isn't a new problem</div>
+    <h2 class="fade-in">Sellers already pay to solve this — by hand.</h2>
+    <p class="lead fade-in">Before any app existed, sellers were buying spreadsheets on Etsy itself just to figure out their real margins. That's the clearest proof this is worth fixing properly.</p>
+    <div class="proof-strip">
+      <div class="proof-card fade-in">
+        <div class="proof-num">5.6M</div>
+        <div class="proof-label">active Etsy sellers as of Dec 2025</div>
+        <div class="proof-src">Etsy 10-K, Feb 2026</div>
+      </div>
+      <div class="proof-card fade-in">
+        <div class="proof-num">24.5%</div>
+        <div class="proof-label">Etsy's record take rate, Q4 2025 — the highest ever</div>
+        <div class="proof-src">Etsy Q4/FY2025 results</div>
+      </div>
+      <div class="proof-card fade-in">
+        <div class="proof-num">900+</div>
+        <div class="proof-label">five-star reviews on a single manual fee-calculator spreadsheet sold on Etsy</div>
+        <div class="proof-src">Public Etsy listing data</div>
+      </div>
+      <div class="proof-card fade-in">
+        <div class="proof-num">2M+</div>
+        <div class="proof-label">Etsy shops already use eRank, which bundles a basic profit calculator into its SEO tool</div>
+        <div class="proof-src">eRank public figures</div>
+      </div>
+      <div class="proof-card fade-in">
+        <div class="proof-num">848K+</div>
+        <div class="proof-label">sellers use Alura — its profit analytics are a side feature, not the focus</div>
+        <div class="proof-src">Alura public figures</div>
+      </div>
+      <div class="proof-card fade-in">
+        <div class="proof-num">$49/mo</div>
+        <div class="proof-label">what Craftybase charges for full profit tracking — built for inventory-heavy shops, not a quick check</div>
+        <div class="proof-src">Craftybase / Stocksmith pricing</div>
+      </div>
+    </div>
+    <p style="margin-top:20px; font-size:0.85rem; color:var(--text-faint); max-width:560px;">These are existing tools' real published numbers — not signups for this page. We're not there yet, and won't pretend otherwise.</p>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="kicker">How it works</div>
+    <h2 class="fade-in">Connect it, or upload it. Your call.</h2>
+    <p class="lead fade-in">No manual formulas, no re-doing a spreadsheet every month. A preview of what early access looks like:</p>
+    <div class="steps">
+      <div class="step fade-in">
+        <span class="num">01</span>
+        <h3>Connect your shop, or upload a CSV</h3>
+        <p>Link your shop through Etsy's own official login (OAuth) for automatic sync — or export your order CSV and upload it. No password sharing, either way.</p>
+      </div>
+      <div class="step fade-in">
+        <span class="num">02</span>
+        <h3>See your profit after every fee</h3>
+        <p>Every Etsy fee accounted for, including Offsite Ads — the one Etsy's own calculator skips. Add your own materials or shipping cost per listing for an even fuller picture, whenever you want.</p>
+      </div>
+      <div class="step fade-in">
+        <span class="num">03</span>
+        <h3>Get told when margin slips</h3>
+        <p>A weekly check-in flags anything trending the wrong way, before it's a surprise.</p>
+      </div>
+    </div>
+
+    <div class="laptop fade-in">
+      <div class="laptop-bezel">
+        <div class="laptop-cam"></div>
+        <div class="laptop-screen">
+          <div class="browser-bar">
+            <div class="dots"><span></span><span></span><span></span></div>
+            <div class="url">porchlight.app/dashboard</div>
+          </div>
+          <div class="screen-tabs">
+            <button class="screen-tab active" data-screen="overview">Overview</button>
+            <button class="screen-tab" data-screen="listings">All listings</button>
+          </div>
+          <div class="screen-panel active" id="screen-overview">
+          <div class="dash">
+            <div class="dash-sync">
+              <div class="sync-status"><span class="sync-dot"></span> Synced via Etsy · 2 minutes ago</div>
+              <div class="range-pill">Last 30 days ▾</div>
+            </div>
+            <div class="dash-kpis">
+              <div class="kpi"><div class="kpi-label">Revenue, 30d</div><div class="kpi-val">$4,120</div><div class="kpi-delta up">▲ 8% vs last month</div></div>
+              <div class="kpi"><div class="kpi-label">Total fees</div><div class="kpi-val">$1,180</div><div class="kpi-delta down">▲ 6% vs last month</div></div>
+              <div class="kpi"><div class="kpi-label">Profit after fees</div><div class="kpi-val profit">$2,940</div><div class="kpi-delta up">▲ 9% vs last month</div></div>
+              <div class="kpi"><div class="kpi-label">Avg margin</div><div class="kpi-val profit">31%</div><div class="kpi-delta down">▼ 2pts vs last month</div></div>
+            </div>
+
+            <div class="dash-alert">
+              <span class="alert-icon">⚠️</span>
+              <div>
+                <div class="alert-title">Needs attention: Custom pet portrait</div>
+                <div class="alert-body">Margin dropped to <b>6%</b> this month, down from 24% in July — mostly Offsite Ads plus a price that hasn't kept up with rising processing costs. Raising the price by $4–5 would bring this back in line with your other listings.</div>
+              </div>
+            </div>
+
+            <div class="dash-charts">
+              <div class="chart-card">
+                <div class="chart-title">Profit trend — last 8 weeks</div>
+                <svg viewBox="0 0 400 130" width="100%" height="130">
+                  <defs>
+                    <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#6FA287" stop-opacity="0.35"/>
+                      <stop offset="100%" stop-color="#6FA287" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <line x1="0" y1="30" x2="400" y2="30" stroke="#33363B" stroke-width="1"/>
+                  <line x1="0" y1="70" x2="400" y2="70" stroke="#33363B" stroke-width="1"/>
+                  <line x1="0" y1="110" x2="400" y2="110" stroke="#33363B" stroke-width="1"/>
+                  <path d="M0,90 L57,78 L114,95 L171,60 L228,42 L285,50 L342,25 L400,18 L400,130 L0,130 Z" fill="url(#areaFill)"/>
+                  <polyline points="0,90 57,78 114,95 171,60 228,42 285,50 342,25 400,18" fill="none" stroke="#86BC9C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="114" cy="95" r="3.5" fill="#B06A5A"/>
+                  <circle cx="400" cy="18" r="3.5" fill="#86BC9C"/>
+                </svg>
+                <div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:0.62rem; color:var(--text-faint); margin-top:2px;">
+                  <span>wk 1</span><span>Offsite Ads spike</span><span>wk 8</span>
+                </div>
+              </div>
+              <div class="chart-card">
+                <div class="chart-title">Margin by listing</div>
+                <svg viewBox="0 0 200 130" width="100%" height="130">
+                  <rect x="6" y="45" width="22" height="85" rx="3" fill="#86BC9C"/>
+                  <rect x="42" y="70" width="22" height="60" rx="3" fill="#B06A5A"/>
+                  <rect x="78" y="30" width="22" height="100" rx="3" fill="#86BC9C"/>
+                  <rect x="114" y="88" width="22" height="42" rx="3" fill="#C08552"/>
+                  <rect x="150" y="20" width="22" height="110" rx="3" fill="#86BC9C"/>
+                  <rect x="172" y="20" width="0" height="0"/>
+                </svg>
+                <div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--text-faint); margin-top:2px;">
+                  <span>Mugs</span><span>Totes</span><span>Beads</span><span>Portrait</span><span>Coasters</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="dash-charts2">
+              <div class="chart-card">
+                <div class="chart-title">Where your money went</div>
+                <div class="breakdown-bar">
+                  <div style="width:44%; background:#C08552;"></div>
+                  <div style="width:23%; background:#8E97A8;"></div>
+                  <div style="width:18%; background:#6E7580;"></div>
+                  <div style="width:11.5%; background:#4C5158;"></div>
+                  <div style="width:3.5%; background:#33363B;"></div>
+                </div>
+                <div class="breakdown-legend">
+                  <div class="legend-row"><div class="lg-left"><span class="lg-dot" style="background:#C08552;"></span>Offsite Ads</div><div class="lg-val">$520 · 44%</div></div>
+                  <div class="legend-row"><div class="lg-left"><span class="lg-dot" style="background:#8E97A8;"></span>Transaction fee</div><div class="lg-val">$268 · 23%</div></div>
+                  <div class="legend-row"><div class="lg-left"><span class="lg-dot" style="background:#6E7580;"></span>Payment processing</div><div class="lg-val">$210 · 18%</div></div>
+                  <div class="legend-row"><div class="lg-left"><span class="lg-dot" style="background:#4C5158;"></span>Other &amp; regulatory</div><div class="lg-val">$140 · 12%</div></div>
+                  <div class="legend-row"><div class="lg-left"><span class="lg-dot" style="background:#33363B;"></span>Listing fees</div><div class="lg-val">$42 · 3%</div></div>
+                </div>
+              </div>
+              <div class="chart-card">
+                <div class="chart-title">Ads insights</div>
+                <div class="ads-compare">
+                  <div class="ads-row">
+                    <div class="ads-label"><span>Organic sales</span><b>34% margin</b></div>
+                    <div class="ads-track"><div class="ads-fill organic" style="width:34%;"></div></div>
+                  </div>
+                  <div class="ads-row">
+                    <div class="ads-label"><span>Offsite Ads sales</span><b>22% margin</b></div>
+                    <div class="ads-track"><div class="ads-fill ads" style="width:22%;"></div></div>
+                  </div>
+                </div>
+                <div class="ads-summary">
+                  <b>14 of 62 orders</b> (23%) came through Offsite Ads this period — and earned <b>12 points less margin</b> on average than your organic sales.
+                </div>
+              </div>
+            </div>
+            <div class="dash-table">
+              <table>
+                <thead><tr><th>Listing</th><th>Revenue</th><th>Fees</th><th>Margin</th></tr></thead>
+                <tbody>
+                  <tr><td>Ceramic mug, set of 2</td><td>$840</td><td>$196</td><td><span class="badge good">42%</span></td></tr>
+                  <tr><td>Linen tote bag</td><td>$310</td><td>$168</td><td><span class="badge low">11%</span></td></tr>
+                  <tr><td>Beaded bracelet</td><td>$560</td><td>$142</td><td><span class="badge good">38%</span></td></tr>
+                  <tr><td>Custom pet portrait</td><td>$420</td><td>$298</td><td><span class="badge low">6%</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="dash-trend">
+              <div class="trend-text"><b>You're keeping 3 points less</b> of every sale than 6 months ago — mostly driven by using Offsite Ads more often this quarter.</div>
+              <div class="trend-bars">
+                <div class="trend-col"><div class="bar then"></div><div class="tc-label">6 MO AGO</div><div class="tc-val">34%</div></div>
+                <div class="trend-col"><div class="bar now"></div><div class="tc-label">NOW</div><div class="tc-val">31%</div></div>
+              </div>
+            </div>
+          </div>
+          </div>
+
+          <div class="screen-panel" id="screen-listings">
+            <div class="dash">
+              <div class="listings-toolbar">
+                <input class="listings-search" type="text" placeholder="Search listings…" disabled>
+                <span class="filter-pill">All (18)</span>
+                <span class="filter-pill active">Needs attention (3)</span>
+                <span class="filter-pill">Healthy (15)</span>
+              </div>
+              <div class="full-table">
+                <table>
+                  <thead><tr><th>Listing</th><th>Revenue</th><th>Fees</th><th>Ads share</th><th>Margin</th></tr></thead>
+                  <tbody>
+                    <tr><td class="listing-name"><span class="thumb" style="background:#8E97A8;"></span>Custom pet portrait</td><td>$420</td><td>$298</td><td>52%</td><td><span class="badge low">6%</span></td></tr>
+                    <tr><td class="listing-name"><span class="thumb" style="background:#B06A5A;"></span>Linen tote bag</td><td>$310</td><td>$168</td><td>38%</td><td><span class="badge low">11%</span></td></tr>
+                    <tr><td class="listing-name"><span class="thumb" style="background:#C08552;"></span>Macrame plant hanger</td><td>$260</td><td>$140</td><td>44%</td><td><span class="badge low">14%</span></td></tr>
+                    <tr><td class="listing-name"><span class="thumb" style="background:#86BC9C;"></span>Beaded bracelet</td><td>$560</td><td>$142</td><td>12%</td><td><span class="badge good">38%</span></td></tr>
+                    <tr><td class="listing-name"><span class="thumb" style="background:#6FA287;"></span>Ceramic mug, set of 2</td><td>$840</td><td>$196</td><td>9%</td><td><span class="badge good">42%</span></td></tr>
+                    <tr><td class="listing-name"><span class="thumb" style="background:#D89D6B;"></span>Wooden coasters, set of 4</td><td>$390</td><td>$88</td><td>6%</td><td><span class="badge good">45%</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      <div class="laptop-base"></div>
+      <div class="caption-note">concept preview — not a live product yet</div>
+
+    <div class="phone-wrap fade-in">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="phone-status"><span>9:41</span><span>Mail</span></div>
+          <div class="email-mock">
+            <div class="email-from">
+              <div class="email-avatar"></div>
+              <div>
+                <div class="email-from-name">Porchlight</div>
+                <div class="email-from-sub">Your weekly check-in</div>
+              </div>
+            </div>
+            <div class="email-subject">Your margin dipped this week</div>
+            <div class="email-stat-chip">▼ 4 points vs last week</div>
+            <div class="email-body">Custom pet portrait is now at 6% margin — down from 18% two weeks ago. Most of the drop is Offsite Ads on this listing. Everything else looks steady.</div>
+            <div class="email-cta">Open Porchlight</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption-note" style="margin-top:14px;">concept preview of the weekly email check-in — not a live product yet</p>
+
+    <div class="connect-split">
+      <div class="connect-card a fade-in">
+        <div class="tag">Automatic</div>
+        <h3>Connect via Etsy's official login</h3>
+        <p>We'll use Etsy's own developer platform (OAuth) — the same secure login Etsy provides to trusted apps. Your shop syncs on its own, no exporting required. We never see or ask for your Etsy password.</p>
+      </div>
+      <div class="connect-card b fade-in">
+        <div class="tag">Always available</div>
+        <h3>Or upload your CSV, no connection needed</h3>
+        <p>Prefer not to connect anything? Export your order history from Etsy and upload it directly. Nothing to authorize, nothing to revoke later.</p>
+      </div>
+    </div>
+    <div class="connect-note fade-in">
+      <strong style="color:var(--text);">One honest catch:</strong> Etsy's own systems don't cleanly link every Offsite Ads fee to the order it came from — even large seller tools run into this. Your CSV export happens to label these more precisely than the automatic connection can right now, so if Offsite Ads accuracy matters most to you, CSV upload will be the more exact option at launch. We'll keep improving the automatic sync as Etsy's platform allows.
+    </div>
+  </div>
+</section>
+
+<section id="compare">
+  <div class="wrap">
+    <div class="kicker">Where this fits</div>
+    <h2 class="fade-in">Not another spreadsheet. Not $49/month.</h2>
+    <p class="lead fade-in">Existing options either bury profit inside a bigger SEO tool, or charge inventory-software prices for something you'll check in thirty seconds.</p>
+    <div class="compare">
+      <table>
+        <thead>
+          <tr><th>Tool</th><th>Focus</th><th>Price</th><th>Offsite Ads included</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Etsy's own calculator</td><td>Rough estimate</td><td>Free</td><td>No — Etsy says so itself</td></tr>
+          <tr><td>Manual spreadsheet</td><td>One-time snapshot</td><td>$3–$10 once</td><td>Only if you update it yourself</td></tr>
+          <tr><td>Craftybase / Stocksmith</td><td>Full inventory + manufacturing</td><td>$49+/mo</td><td>Yes, but with a lot else</td></tr>
+          <tr><td>Alura / eRank</td><td>SEO tools, profit is a side feature</td><td>$8–$30/mo</td><td>Partial</td></tr>
+          <tr class="us"><td><strong>Porchlight</strong></td><td>Just profit after fees, done right</td><td class="hl">TBD — tell us what's fair</td><td class="hl">Yes, always</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="why-now">
+  <div class="wrap">
+    <div class="kicker">Why now</div>
+    <h2 class="fade-in">Fees keep moving. Most sellers don't notice until it's too late.</h2>
+    <div class="timeline">
+      <div class="tl-item fade-in">
+        <div class="tl-date">Sept 2024</div>
+        <p><strong>New shop set-up fee</strong> introduced — $15–$29, one more line item sellers didn't budget for.</p>
+      </div>
+      <div class="tl-item fade-in">
+        <div class="tl-date">Dec 2025</div>
+        <p><strong>Instant Transfer fee</strong> added — getting paid faster now costs extra.</p>
+      </div>
+      <div class="tl-item fade-in">
+        <div class="tl-date">Q4 2025</div>
+        <p><strong>Etsy's take rate hit a record 24.5%</strong> — the largest share of seller revenue Etsy has ever kept.</p>
+      </div>
+      <div class="tl-item fade-in">
+        <div class="tl-date">June 2026</div>
+        <p><strong>Regulatory fees rose sharply</strong> in the UK, France, and Italy — some more than doubling overnight.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="wrap">
+    <div class="kicker">What's next</div>
+    <h2 class="fade-in">One shop today. Sharper tools as we go.</h2>
+    <p class="lead fade-in">We're not going to chase every marketplace at once. Here's the order we're tackling real, known gaps — starting with the one under our own feet.</p>
+
+    <div class="roadmap">
+      <div class="roadmap-rail"></div>
+      <div class="roadmap-rail-fill" id="roadmap-fill"></div>
+
+      <div class="roadmap-item now">
+        <div class="roadmap-dot"></div>
+        <div class="roadmap-status now">Now</div>
+        <h3>Connect your Etsy shop</h3>
+        <p>OAuth sync via Etsy's own official login, or upload a CSV — no password sharing either way. This is the foundation everything else builds on, so it comes first, not last.</p>
+        <div class="rm-note">🔧 Shipping with early access</div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot"></div>
+        <div class="roadmap-status next">Next</div>
+        <h3>Add your own costs</h3>
+        <p>Etsy fees are only part of the story — materials, packaging, and shipping matter too. We're adding a simple cost-per-listing field so your number can reflect what you actually spent, not just what Etsy took. Optional, never required.</p>
+        <div class="rm-note">🎯 The honest gap: without this, we show profit after fees — not full profit</div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot"></div>
+        <div class="roadmap-status next">Next</div>
+        <h3>Closing the Offsite Ads gap</h3>
+        <p>Etsy's own systems don't cleanly link every ad fee to the order it came from — even large seller tools only get partial matches. We're building smarter timing-and-amount matching, plus a one-tap "associate manually" option for anything that doesn't auto-link.</p>
+        <div class="rm-note">📊 Found in our own research — Etsy Support confirms this isn't fully solved platform-wide</div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot"></div>
+        <div class="roadmap-status next">Next</div>
+        <h3>Refunds, tracked properly</h3>
+        <p>Etsy doesn't tell any third-party tool which refund belongs to which order. We're building a simple manual-match flow so a refunded sale doesn't quietly throw off a listing's margin.</p>
+        <div class="rm-note">📊 Same root cause as the Ads gap — Etsy's ledger doesn't expose this link yet</div>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot"></div>
+        <div class="roadmap-status later">Later</div>
+        <h3>Send it straight to your books</h3>
+        <p>Export profit data directly to QuickBooks, or a clean accounting-ready CSV. Same shop, deeper tools — not a reason to add another platform to manage.</p>
+      </div>
+
+      <div class="roadmap-item">
+        <div class="roadmap-dot"></div>
+        <div class="roadmap-status exploring">Exploring</div>
+        <h3>Multi-shop view</h3>
+        <p>Running more than one Etsy shop? A combined view is on the radar — once the single-shop experience is rock solid first.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="waitlist">
+  <div class="wrap">
+    <div class="final fade-in">
+      <div class="kicker" style="justify-content:center; display:flex;">Early access</div>
+      <h2>We haven't built this yet. That's on purpose.</h2>
+      <p class="sub">We're validating this with real sellers before writing a line of code. If this is something you'd actually use, tell us — and we'll build it for you first.</p>
+      <form class="email-form" id="waitlist-form-2">
+        <input type="email" id="email-input-2" placeholder="you@yourshop.com" required>
+        <button type="submit">Join the waitlist</button>
+      </form>
+      <div class="form-success" id="form-success-2" style="justify-content:center;">✓ You're on the list — we'll email you first.</div>
+    </div>
+  </div>
+</section>
+
+<section id="feedback-section">
+  <div class="wrap">
+    <div class="kicker" style="justify-content:center; display:flex;">One more thing</div>
+    <h2 style="text-align:center;">What would make this worth using?</h2>
+    <p class="lead" style="text-align:center; margin:0 auto 30px;">Tell us the one feature or idea you'd actually want. We read every single one — this shapes what we build first.</p>
+    <div class="feedback-box fade-in">
+      <form id="feedback-form">
+        <textarea id="feedback-message" placeholder="e.g. &quot;I'd love to see a low-stock alert tied to margin, not just quantity&quot;…" required></textarea>
+        <input type="email" id="feedback-email" placeholder="Your email (optional, in case we want to follow up)">
+        <div class="fb-note">No spam, no sales pitch — we just might ask a follow-up question.</div>
+        <button type="submit">Send feedback</button>
+      </form>
+      <div class="fb-success" id="fb-success">✓ Got it — thank you, genuinely.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Porchlight is an idea in validation, not a live product yet. Fee figures reflect Etsy's published US fee schedule as of 2026.
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Receipt line-by-line reveal
+  const receiptLines = document.querySelectorAll('.r-line[data-i]');
+  let revealed = false;
+  const receiptObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting && !revealed){
+        revealed = true;
+        receiptLines.forEach((line, idx) => {
+          setTimeout(() => line.classList.add('show'), idx * 350);
+        });
+        setTimeout(() => document.getElementById('total-line').classList.add('show'), receiptLines.length * 350 + 200);
+      }
+    });
+  }, { threshold: 0.4 });
+  receiptObserver.observe(document.querySelector('.receipt'));
+
+  // Receipt toggle (with/without ads)
+  const toggleBtns = document.querySelectorAll('.r-toggle button');
+  const adsLine = document.getElementById('ads-line');
+  const totalVal = document.getElementById('total-val');
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if(btn.dataset.mode === 'ads'){
+        adsLine.style.display = 'flex';
+        totalVal.textContent = '$75.05';
+      } else {
+        adsLine.style.display = 'none';
+        totalVal.textContent = '$90.05';
+      }
+    });
+  });
+
+  // ---- Supabase config ----
+  // The anon key below is safe to expose publicly by design (it's rate-limited and
+  // restricted by Row Level Security — see supabase_setup.sql), but we still keep it
+  // out of committed source: the placeholder is swapped for the real value at deploy
+  // time by the GitHub Actions workflow, using a repo secret.
+  const SUPABASE_URL = "https://eshwmuksvbqoamckxsmz.supabase.co";
+  const SUPABASE_ANON_KEY = "__SUPABASE_ANON_KEY__";
+
+  async function supabaseInsert(table, payload) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      let code;
+      try { code = JSON.parse(text).code; } catch (e) {}
+      const err = new Error(`Supabase insert failed (${res.status}): ${text}`);
+      err.status = res.status;
+      err.code = code;
+      throw err;
+    }
+  }
+
+  async function getWaitlistCount() {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_waitlist_count`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: '{}'
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return typeof data === 'number' ? data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  // ---- Success modal ----
+  const modalOverlay = document.getElementById('success-modal');
+  const modalCount = document.getElementById('modal-count');
+  const modalTitle = document.getElementById('modal-title');
+  const modalBody = document.getElementById('modal-body');
+  const modalNugget = document.getElementById('modal-nugget');
+  const modalIcon = document.getElementById('modal-icon');
+
+  function openModal({ icon, count, title, body, nugget }) {
+    modalIcon.textContent = icon || '🎉';
+    if (count) {
+      modalCount.textContent = `#${count}`;
+      modalCount.style.display = 'block';
+    } else {
+      modalCount.style.display = 'none';
+    }
+    modalTitle.textContent = title;
+    modalBody.innerHTML = body;
+    if (nugget) {
+      modalNugget.innerHTML = nugget;
+      modalNugget.style.display = 'block';
+    } else {
+      modalNugget.style.display = 'none';
+    }
+    modalOverlay.classList.add('show');
+  }
+  function closeModal() { modalOverlay.classList.remove('show'); }
+  document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  // ---- Waitlist forms ----
+  function handleWaitlist(formId, inputId){
+    const form = document.getElementById(formId);
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const emailInput = document.getElementById(inputId);
+      const email = emailInput.value.trim();
+      const button = form.querySelector('button');
+      const originalText = button.textContent;
+      button.textContent = 'Joining…';
+      button.disabled = true;
+      try {
+        await supabaseInsert('waitlist_signups', { email });
+        const count = await getWaitlistCount();
+        openModal({
+          icon: '🕯️',
+          count: count,
+          title: "You're in.",
+          body: count
+            ? `You're <b>signup #${count}</b> — an actual, real number, not a made-up one. We read every email on this list ourselves.`
+            : `Thanks for signing up. We read every email on this list ourselves.`,
+          nugget: `<b>Something to sit with while you wait:</b> sellers running Offsite Ads lose an average of 12 margin points versus their organic sales. Most never see that number broken out. You will.`
+        });
+        emailInput.value = '';
+      } catch (err) {
+        console.error(err);
+        if (err.code === '23505') {
+          openModal({
+            icon: '👋',
+            title: "You're already on the list",
+            body: `That email's already signed up — we'll be in touch.`
+          });
+        } else {
+          openModal({
+            icon: '⚠️',
+            title: "Something went wrong",
+            body: `We couldn't save that just now. Mind trying again in a moment?`
+          });
+        }
+      } finally {
+        button.textContent = originalText;
+        button.disabled = false;
+      }
+    });
+  }
+  handleWaitlist('waitlist-form', 'email-input');
+  handleWaitlist('waitlist-form-2', 'email-input-2');
+
+  // ---- Feedback form ----
+  const feedbackForm = document.getElementById('feedback-form');
+  if (feedbackForm) {
+    feedbackForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const messageInput = document.getElementById('feedback-message');
+      const emailInput = document.getElementById('feedback-email');
+      const button = feedbackForm.querySelector('button');
+      const originalText = button.textContent;
+      button.textContent = 'Sending…';
+      button.disabled = true;
+      try {
+        await supabaseInsert('feedback', {
+          message: messageInput.value.trim(),
+          email: emailInput.value.trim() || null
+        });
+        feedbackForm.style.display = 'none';
+        document.getElementById('fb-success').classList.add('show');
+        openModal({
+          icon: '💡',
+          title: "Thank you, genuinely.",
+          body: `That kind of detail is exactly what shapes what gets built first. If you left an email, we might follow up with a question.`
+        });
+      } catch (err) {
+        console.error(err);
+        openModal({
+          icon: '⚠️',
+          title: "Something went wrong",
+          body: `We couldn't save that just now. Mind trying again in a moment?`
+        });
+        button.textContent = originalText;
+        button.disabled = false;
+      }
+    });
+  }
+
+  // Laptop screen tabs
+  document.querySelectorAll('.screen-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.screen;
+      document.querySelectorAll('.screen-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.screen-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('screen-' + target).classList.add('active');
+    });
+  });
+
+  // Roadmap scroll animation: rail fills as each stage is reached
+  const roadmapItems = Array.from(document.querySelectorAll('.roadmap-item'));
+  const roadmapFill = document.getElementById('roadmap-fill');
+  if (roadmapItems.length) {
+    const roadmapObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('reached');
+      });
+      const reachedCount = roadmapItems.filter(el => el.classList.contains('reached')).length;
+      const pct = (reachedCount / roadmapItems.length) * 100;
+      roadmapFill.style.height = pct + '%';
+    }, { threshold: 0.5 });
+    roadmapItems.forEach(item => roadmapObserver.observe(item));
+  }
+</script>
+
+</body>
+</html>
