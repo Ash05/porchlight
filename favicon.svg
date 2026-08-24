@@ -1,0 +1,15 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="3.2"/>
+    </filter>
+    <radialGradient id="dotGrad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#F0C39A"/>
+      <stop offset="100%" stop-color="#C08552"/>
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#14161A"/>
+  <path d="M10,30 Q32,6 54,30" fill="none" stroke="#EDEAE3" stroke-width="4.6" stroke-linecap="round"/>
+  <circle cx="32" cy="44" r="15" fill="#C08552" opacity="0.4" filter="url(#glow)"/>
+  <circle cx="32" cy="44" r="9.5" fill="url(#dotGrad)"/>
+</svg>
